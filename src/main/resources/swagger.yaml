@@ -1,0 +1,670 @@
+swagger: '2.0'
+info:
+  version: 1.1.0
+  title: User Management
+  x-goldenVersion: 3.3.0
+host: 'localhost:8081'
+basePath: /expensio/api/v1/user
+tags:
+  - name: identity
+    description: Identity Access Management Operations.
+  - name: profile
+    description: User Profile Management Operations.
+schemes:
+  - http
+produces:
+  - application/json
+consumes:
+  - application/json
+parameters:
+  mobileNumber:
+    name: mobileNumber
+    minLength: 10
+    maxLength: 15
+    pattern: '/^(\+\d{1,3}[- ]?)? \d{10}$/'
+    type: string
+    in: path
+    required: true
+  userId:
+    name: userId
+    pattern: '^[a-zA-Z0-9-]+$'
+    minLength: 16
+    type: string
+    in: path
+    required: true
+paths:
+  '/sendVerificationCode/{phoneNumber}':
+    post:
+      tags:
+        - identity
+      description: Generates verification code for registration
+      operationId: registrationVerificationOp
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: phoneNumber
+          required: true
+          type: string
+      responses:
+        '200':
+          $ref: '#/responses/200VerificationResponse'
+        '400':
+          $ref: '#/responses/400ErrorResponse'
+        '500':
+          $ref: '#/responses/500ErrorResponse'
+  '/validate':
+    post:
+      tags:
+        - identity
+      description: Validates the otp sent to the user.
+      operationId: validateOTP
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: validateOTPRequest
+          description: OTP validation request.
+          required: true
+          schema:
+            $ref: '#/definitions/validateRegisterOTPRequest'
+      responses:
+        '200':
+          $ref: '#/responses/200VerificationCheckResponse'
+        '400':
+          $ref: '#/responses/400ErrorResponse'
+        '500':
+          $ref: '#/responses/500ErrorResponse'
+  '/register/{referenceId}':
+    post:
+      tags:
+        - identity
+      description: Registers the user into the system.
+      operationId: userRegistration
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: referenceId
+          required: true
+          type: string
+        - in: body
+          name: registerUserRequest
+          description: User registration DTO
+          required: true
+          schema:
+            $ref: '#/definitions/registerUserRequest'
+      responses:
+        '201':
+          $ref: '#/responses/201RegisterUserResponse'
+        '400':
+          $ref: '#/responses/400ErrorResponse'
+        '500':
+          $ref: '#/responses/500ErrorResponse'
+  '/login/{phoneNumber}/{referenceId}':
+    post:
+      tags:
+        - identity
+      description: Operation to login in system
+      operationId: userLoginOperation
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: referenceId
+          required: true
+          type: string
+        - in: path
+          name: phoneNumber
+          required: true
+          pattern : "^\\s*(?:\\+?(\\d{1,3}))?[-. (]*(\\d{3})[-. )]*(\\d{3})[-. ]*(\\d{4})(?: *x(\\d+))?\\s*$"
+          type: string
+      responses:
+        '200':
+          $ref: '#/responses/200UserLoginResponse'
+        '400':
+          $ref: '#/responses/400ErrorResponse'
+        '500':
+          $ref: '#/responses/500ErrorResponse'
+  '/{userId}/logout':
+    post:
+      tags:
+        - identity
+      description: Logs system out of user.
+      operationId: logout
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          type: string
+          pattern: ^[a-zA-Z0-9-]+$
+      responses:
+        '204':
+          description: 'NO CONTENT'
+        '400':
+          $ref: '#/responses/400ErrorResponse'
+        '500':
+          $ref: '#/responses/500ErrorResponse'
+  '/{userId}/profile':
+    patch:
+      tags:
+        - profile
+      description: updates user profile into the system.
+      operationId: profileModification
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          type: string
+          pattern: ^[a-zA-Z0-9-]+$
+        - in: body
+          name: profileRequest
+          description: User Profile Request
+          required: true
+          schema:
+            $ref: '#/definitions/updateProfileRequest'
+      responses:
+        '204':
+          description: 'NO CONTENT'
+        '400':
+          $ref: '#/responses/400ErrorResponse'
+        '500':
+          $ref: '#/responses/500ErrorResponse'
+  '/profile/{profileId}':
+    get:
+      tags:
+        - profile
+      description: retrieves user profile from the system.
+      operationId: retrieveProfile
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: profileId
+          required: true
+          type: string
+          pattern: ^[a-zA-Z0-9-]+$
+      responses:
+        '200':
+          $ref: '#/responses/200UserProfileResponse'
+        '400':
+          $ref: '#/responses/400ErrorResponse'
+        '500':
+          $ref: '#/responses/500ErrorResponse'
+  '/healthcheck':
+    get:
+      consumes:
+        - '*/*'
+      tags:
+        - HealthCheck
+      description: retrieves HealthCheck Summary of API.
+      operationId: getHealthCheckStatus
+      responses:
+        '200':
+          $ref: '#/responses/200healthCheckStatusResponse'
+responses:
+  200VerificationResponse:
+    description: OK
+    schema:
+      $ref: '#/definitions/verificationApiResponse'
+  200VerificationCheckResponse:
+    description: OK
+    schema:
+      $ref: '#/definitions/verificationCheckApiResponse'
+  201RegisterUserResponse:
+    description: OK
+    schema:
+      $ref: '#/definitions/userLoginResponse'
+  200UserLoginResponse:
+    description: OK
+    schema:
+      $ref: '#/definitions/userLoginResponse'
+  200UserProfileResponse:
+    description: OK
+    schema:
+      $ref: '#/definitions/userProfileResponse'
+  200healthCheckStatusResponse:
+    description: healthcheck status
+    schema:
+      $ref: '#/definitions/healthCheckStatus'
+  400ErrorResponse:
+    description: |
+      __Bad Request__
+
+      Possible errors
+
+      | Error Code | Error Message | Error Description |
+      | ------- | -------- | --- |
+      | 1001    | Missing {field Name} |{field Name} must not be null |
+      | 1002    | Invalid {field Name} |{field Name} must match <pattern>|
+      | 1003    | Invalid request      | {error description} |
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+  404ErrorResponse:
+    description: |
+      __Resource Not Found__
+
+      Possible errors
+
+      | Error Code | Error Message | Error Description |
+      | ------- | -------- | --- |
+      | 2001    | Device not found |Device not found |
+    schema:
+      type: object
+      properties:
+        result:
+          type: object
+          properties:
+            errors:
+              type: array
+              items:
+                $ref: '#/definitions/404Error'
+      example:
+        result:
+          errors:
+            - code: 2001
+              message: Device not found
+              details: Device not found
+  500ErrorResponse:
+    description: |
+      __Internal Server Error__
+
+      Possible errors
+      
+        | Error Code | Error Message | Error Description |
+        | ------- | -------- | --- |
+        | 10001   | Host Unavailable  | The downstream system failed to accept the request |
+        | 10002   | Provider Timeout  | The downstream system failed to respond within the expected time periods |
+        | 10003   | Technical Error   | < provider error > |
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+definitions:
+  healthCheckStatus:
+    description: healthcheck status
+    properties:
+      status:
+        type: string
+        enum:
+          - success
+  registerUserRequest:
+    description: userRegistrationRequest
+    required:
+      - name
+      - email
+      - mobileNumber
+    properties:
+      name:
+        type: string
+        description: name of user to be registered
+        maxLength: 40
+        pattern: ^[a-zA-Z\s]*$
+      email:
+        type: string
+        description: User email to uniquely identify the customer.
+        format: email
+        maxLength: 40
+      mobileNumber:
+        type: string
+        description: Mobile number of user
+        pattern: ^[7-9][0-9]{9}$
+  baseApiResponse:
+    description: api response model
+    properties:
+      timestamp:
+        type: string
+        description: timestamp for response
+        example: '2020-01-01 00:00:00'
+      contextId:
+        type: string
+        description: unique identifier for context of communication between client and server
+        example: ''
+      status:
+        type: string
+        description: status  representing the request state
+        enum:
+          - OK
+          - ERROR
+          - PARTIAL_ERROR
+      statusCode:
+        type: integer
+        description : statusCode
+      errors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+  verificationApiResponse:
+    description: api response model
+    allOf:
+      - $ref: '#/definitions/baseApiResponse'
+    properties:
+      verificationRefId:
+        type: string
+        description: referenceId for validating OTP
+      tokenExpirryTime:
+        type: integer
+        description: expiry tme for OTP in minutes
+  verificationCheckApiResponse:
+    description: api response model
+    allOf:
+      - $ref: '#/definitions/baseApiResponse'
+    properties:
+      isValid:
+        type: boolean
+        description: status of verification check call
+  loginRequest:
+    description: userRegistrationRequest
+    required:
+      - username
+      - password
+    properties:
+      username:
+        type: string
+        description: Username required for uthentication into the system.
+        format: email
+        maxLength: 40
+      password:
+        type: string
+        description: Password required for authentication in the system.
+        pattern: '^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$'
+        minLength: 6
+        maxLength: 10
+        format: password
+  userLoginResponse:
+    description: User Login Response
+    allOf:
+      - $ref: '#/definitions/baseApiResponse'
+    properties:
+      data:
+        type: object
+        properties:
+          bearerToken:
+            type: string
+            description: Token for making calls to restricted resources.
+          userId:
+            type: string
+            description:  unique identifier for user in the system.
+          expiresIn:
+            type: number
+            description: Duration after which the token will expire.
+  validateRegisterOTPRequest:
+    description: request for OTP validation
+    required:
+      - phoneNumber
+      - referenceId
+      - otpCode
+    properties:
+      phoneNumber:
+        description: Phone number
+        type: string
+      referenceId:
+        description: reference Id
+        type: string
+      otpCode:
+        description: OTP value which needs to be validated
+        type: string
+  updateProfileRequest:
+    description: request for profile creation
+    properties:
+      name:
+        description: name of user
+        type: string
+        pattern: ^[a-zA-Z\s]*$
+      identityNumber:
+        description: unique identity of user
+        type: string
+        enum:
+          - AADHAR
+          - PAN
+          - PASSPoRT_NUMBER
+          - VOTER_NUMBER
+      dateOfBirth:
+        description: date of birth of user
+        type: string
+        pattern: date
+      profilePic:
+        description: Profile Pic of the user to be displayed as avatar.
+        type: string
+        format: url
+      address:
+        description: address of the user
+        type: array
+        items:
+          $ref: '#/definitions/addressInformation'
+      memeberSince:
+        description: mentions the date from which the user is member
+        type: string
+        format: date
+      alternateEmail:
+        description: alternative email of the user
+        type: string
+        format: email
+      alternatePhone:
+        description: alternative mobileNumber of the user.
+        type: string
+        format: mobileNumber
+      accountSetting:
+        $ref: '#/definitions/updateaccountInformationRequest'
+  userProfileResponse:
+    description: user profile retrieval response
+    properties:
+      data:
+        type: object
+        properties:
+          name:
+            description: name of user
+            type: string
+            pattern: ^[a-zA-Z\s]*$
+          identityNumber:
+            description: unique identity of user
+            type: string
+            enum:
+              - AADHAR
+              - PAN
+              - PASSPoRT_NUMBER
+              - VOTER_NUMBER
+          dateOfBirth:
+            description: date of birth of user
+            type: string
+            pattern: date
+          profilePic:
+            description: Profile Pic of the user to be displayed as avatar.
+            type: string
+            format: url
+          address:
+            description: address of the user
+            type: array
+            items:
+              $ref: '#/definitions/addressInformation'
+          memeberSince:
+            description: mentions the date from which the user is member
+            type: string
+            format: date
+          alternateEmail:
+            description: alternative email of the user
+            type: string
+            format: email
+          alternatePhone:
+            description: alternative mobileNumber of the user.
+            type: string
+            format: mobileNumber
+          accountSetting:
+            $ref: '#/definitions/accountInformation'
+          configuration:
+            $ref: '#/definitions/configurationInformation'
+  addressInformation:
+    description: Address information of user
+    required:
+      - lineOne
+      - street
+      - city
+      - state
+      - country
+      - zipCode
+      - type
+    properties:
+      lineOne:
+        description: Line 1
+        type: string
+      lineTwo:
+        description: line 2
+        type: string
+      street:
+        description: street component of the address.
+        type: string
+      city:
+        description: city component of the address.
+        type: string
+      state:
+        description: state component of address.
+        type: string
+      zipCode:
+        description: pinCode component of address.
+        type: integer
+        maxLength: 6
+      country:
+        description: country component of address
+        type: string
+        enum:
+          - IN
+          - USA
+          - SWZ
+          - GER
+      addressType:
+        type: string
+        enum:
+          - HOME
+          - WORK
+          - OTHER
+  updateaccountInformationRequest:
+    description: account settings of user
+    properties:
+      displayName:
+        type: string
+        format: ^[a-zA-Z\s]+$
+      defaultCurrency:
+        description: default currency for user
+        type: string
+        enum:
+          - RS
+          - USD
+          - SAR
+      maskFigures:
+        type: boolean
+        description: Whether currencies needs to be masked while displaying figures
+  accountInformation:
+    description: account settings of user
+    properties:
+      displayName:
+        type: string
+        format: ^[a-zA-Z\s]+$
+      defaultCurrency:
+        description: default currency for user
+        type: string
+        enum:
+          - RS
+          - USD
+          - SAR
+      accountType:
+        type: string
+        enum:
+          - INDIVIDUAL
+          - PREMIUM
+          - NETWORK
+      maskFigures:
+        type: boolean
+        description: Whether currencies needs to be masked while displaying figures
+      isKycDone:
+        type: boolean
+        description: Whether ekyc has been done for the account or not.
+  configurationInformation:
+    description: configuration settings of user
+    properties:
+      category:
+        description: categories for user for managing expenses and income and other financial metrics
+        type: array
+        items:
+          $ref: '#/definitions/categoryInformation'
+  categoryInformation:
+    description: Category information of user
+    properties:
+      name:
+        description: name of category
+        type: string
+      key:
+        description: name of category
+        type: string
+      value:
+        description: category value
+        type: string
+      type:
+        description: type of category
+        type: string
+        enum:
+          - INCOME_SOURCE
+          - EXPENSE_CATEGORY
+  ErrorResponse:
+    description: Error response
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/ErrorResult'
+  ErrorResult:
+    description: Array of errors
+    type: object
+    properties:
+      errors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+  Error:
+    description: Represent an individual error.
+    type: object
+    properties:
+      code:
+        description: Error Code.
+        type: integer
+        format: int32
+      message:
+        description: Error Message
+        type: string
+      details:
+        description: Detailed information about the error
+        type: string
+  404Error:
+    description: Represent an individual error.
+    type: object
+    required:
+      - code
+      - message
+    properties:
+      code:
+        description: Error Code.
+        type: integer
+        format: int32
+        example: 2001
+      message:
+        description: Error Message
+        type: string
+        example: Device not found
+      details:
+        description: Detailed information about the error
+        type: string
+        example: Device not found
