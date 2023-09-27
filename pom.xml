@@ -12,6 +12,7 @@
 	<artifactId>identityService</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>identityService</name>
+	<packaging>jar</packaging>
 	<description>IAM module for finbiz</description>
 	<properties>
 		<java.version>1.8</java.version>

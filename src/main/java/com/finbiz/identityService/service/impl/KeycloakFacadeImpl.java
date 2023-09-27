@@ -2,29 +2,18 @@ package com.finbiz.identityService.service.impl;
 
 import com.finbiz.identityService.config.KeycloakConfig;
 import com.finbiz.identityService.constants.ApiConstants;
-import com.finbiz.identityService.constants.ErrorCodeConstants;
-import com.finbiz.identityService.constants.ErrorMsgConstants;
 import com.finbiz.identityService.dto.LoginDTO;
 import com.finbiz.identityService.dto.RegisterUserDTO;
 import com.finbiz.identityService.dto.RoleDTO;
-import com.finbiz.identityService.exception.BusinessException;
-import com.finbiz.identityService.exception.ExceptionBuilder;
 import com.finbiz.identityService.service.spec.KeycloakFacade;
-import com.finbiz.identityService.util.EncryptionUtil;
-import com.finbiz.transactionmanager.api.spec.model.LoginRequest;
-import com.finbiz.transactionmanager.api.spec.model.RegisterUserRequest;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.http.client.methods.HttpRequestWrapper;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.OAuth2Constants;
-import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
@@ -33,24 +22,13 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.client.RestTemplate;
 
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @Log4j2
