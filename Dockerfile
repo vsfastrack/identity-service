@@ -8,5 +8,7 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
+EXPOSE 8085
+
 # Specify how to run the application
 CMD ["java", "-jar", "target/identityService-0.0.1-SNAPSHOT.jar"]
