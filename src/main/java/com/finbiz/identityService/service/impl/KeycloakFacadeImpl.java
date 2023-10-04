@@ -69,6 +69,7 @@ public class KeycloakFacadeImpl implements KeycloakFacade {
             userRepresentation.setCredentials(Collections.singletonList(passwordCred));
             RealmResource realmResource = keycloakClient.realm(keycloakConfig.getRealm());
             Response keycloakResponse = realmResource.users().create(userRepresentation);
+            log.info("Response status received {}",keycloakResponse.getStatus());
             if(keycloakResponse.getStatus() == Response.Status.CREATED.getStatusCode()){
                 String userId = keycloakResponse.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
                 List<String> roleNames = Collections.singletonList("ROLE_USER");
