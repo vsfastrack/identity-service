@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels: #PODS
+    app: identity-service
+  name: identity-service
+  namespace: default
+spec:
+  ports:
+    - # nodePort: 30702 #CHANGE
+      port: 8085 #CHANGE
+      protocol: TCP
+      targetPort: 8085 #CHANGE
+  selector:
+    app: identity-service
+  sessionAffinity: None #CHANGE
+  type: LoadBalancer

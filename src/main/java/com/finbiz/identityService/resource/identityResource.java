@@ -1,10 +1,10 @@
 package com.finbiz.identityService.resource;
 
 import com.finbiz.identityService.dto.LoginDTO;
+import com.finbiz.identityService.dto.LoginResponseDTO;
 import com.finbiz.identityService.dto.RegisterUserDTO;
 import com.finbiz.identityService.dto.RoleDTO;
 import com.finbiz.identityService.service.IdentityService;
-import com.finbiz.transactionmanager.api.spec.model.UserLoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +18,8 @@ public class identityResource {
     private final IdentityService identityService;
 
     @PostMapping(value = "/login")
-    public ResponseEntity<UserLoginResponse> login(@RequestBody LoginDTO loginDTO){
-        UserLoginResponse loginResponse = identityService.login(loginDTO);
-        return ResponseEntity.ok(loginResponse);
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginDTO loginDTO){
+        return ResponseEntity.ok(identityService.login(loginDTO));
     }
 
     @PostMapping(value = "/register")

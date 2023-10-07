@@ -77,11 +77,11 @@
 			<artifactId>gson</artifactId>
 			<version>2.9.0</version>
 		</dependency>
-		<dependency>
-			<groupId>io.swagger</groupId>
-			<artifactId>swagger-codegen-maven-plugin</artifactId>
-			<version>2.4.27</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>io.swagger</groupId>-->
+<!--			<artifactId>swagger-codegen-maven-plugin</artifactId>-->
+<!--			<version>2.4.27</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
@@ -113,6 +113,10 @@
 			<version>8.36.0</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -130,14 +134,13 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
+				<executions>
+					<execution>
+						<configuration>
+							<mainClass>com.finbiz.identityService.IdentityServiceApplication</mainClass>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -147,37 +150,37 @@
 					<target>8</target>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>io.swagger</groupId>
-				<artifactId>swagger-codegen-maven-plugin</artifactId>
-				<version>2.4.27</version>
-				<executions>
-					<execution>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<inputSpec>${project.basedir}/src/main/resources/swagger.yaml</inputSpec>
-							<language>spring</language>
-							<output>${project.build.directory}/generated-sources</output>
-							<apiPackage>com.finbiz.transactionmanager.api.spec.handler</apiPackage>
-							<modelPackage>com.finbiz.transactionmanager.api.spec.model</modelPackage>
-							<invokerPackage>com.finbiz.transactionmanager.api.spec</invokerPackage>
-							<generateSupportingFiles>false</generateSupportingFiles>
-							<configOptions>
-								<sourceFolder>swagger</sourceFolder>
-								<library>spring-boot</library>
-								<interfaceOnly>true</interfaceOnly>
-								<useTags>true</useTags>
-								<useOptional>true</useOptional>
-								<dateLibrary>java8</dateLibrary>
-								<serializableModel>true</serializableModel>
-							</configOptions>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>io.swagger</groupId>-->
+<!--				<artifactId>swagger-codegen-maven-plugin</artifactId>-->
+<!--				<version>2.4.27</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<phase>generate-sources</phase>-->
+<!--						<goals>-->
+<!--							<goal>generate</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<inputSpec>${project.basedir}/src/main/resources/swagger.yaml</inputSpec>-->
+<!--							<language>spring</language>-->
+<!--							<output>${project.build.directory}/generated-sources</output>-->
+<!--							<apiPackage>com.finbiz.transactionmanager.api.spec.handler</apiPackage>-->
+<!--							<modelPackage>com.finbiz.transactionmanager.api.spec.model</modelPackage>-->
+<!--							<invokerPackage>com.finbiz.transactionmanager.api.spec</invokerPackage>-->
+<!--							<generateSupportingFiles>false</generateSupportingFiles>-->
+<!--							<configOptions>-->
+<!--								<sourceFolder>swagger</sourceFolder>-->
+<!--								<library>spring-boot</library>-->
+<!--								<interfaceOnly>true</interfaceOnly>-->
+<!--								<useTags>true</useTags>-->
+<!--								<useOptional>true</useOptional>-->
+<!--								<dateLibrary>java8</dateLibrary>-->
+<!--								<serializableModel>true</serializableModel>-->
+<!--							</configOptions>-->
+<!--						</configuration>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 		</plugins>
 	</build>
 

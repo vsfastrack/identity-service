@@ -13,12 +13,4 @@ public class Error {
         return error;
     }
 
-    public static com.finbiz.transactionmanager.api.spec.model.Error from(Error error){
-        com.finbiz.transactionmanager.api.spec.model.Error errorResponse = new com.finbiz.transactionmanager.api.spec.model.Error();
-        errorResponse.setCode(error.code);
-        errorResponse.setMessage(error.message);
-        errorResponse.setDetails(error.type);
-        return  errorResponse;
-    }
-
 }
