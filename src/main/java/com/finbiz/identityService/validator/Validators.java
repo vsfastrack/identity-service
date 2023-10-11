@@ -28,8 +28,5 @@ public class Validators {
         return (StringUtils.length(value) > length) ;
     }
 
-    public static boolean validateMinValue(BigDecimal value , BigDecimal minValue){
-        return value.compareTo(minValue) >= 0;
-    }
 }
 
