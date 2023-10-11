@@ -1,0 +1,54 @@
+name: Publish UAT
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.3.0
+        with:
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCLOUD_AUTH_KEY }}
+          export_default_credentials: true
+          configure_docker: true
+
+      - name: Install kubectl
+        run: |
+          gcloud components install kubectl
+          echo "kubectl version: $(kubectl version --client --short)"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build -t identity-service:latest .
+
+      - name: Tag Docker image
+        run: docker tag identity-service:latest ${{ secrets.DOCKER_USERNAME }}/tech-bee:identity-service-latest
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/tech-bee:identity-service-latest
+
+      - name: Configure kubectl
+        run: |
+          gcloud container clusters get-credentials techbee-cluster --zone us-central1-c
+          kubectl config use-context gke_banded-pad-397603_us-central1-c_techbee-cluster
+
+      - name: Delete existing deployment
+        run: kubectl delete deployments identity-service --ignore-not-found=true
+
+      - name: k8s deployment
+        run: kubectl apply -f k8s/deployment.yaml
