@@ -3,9 +3,13 @@ package com.finbiz.identityService.util;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.keycloak.KeycloakPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.BadPaddingException;
@@ -55,5 +59,14 @@ public class EncryptionUtil {
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
         byte[] decryptedBytes = cipher.doFinal(Base64.decodeBase64(encrypted));
         return new String(decryptedBytes);
+    }
+
+    public static String getUsernameForCurrentLoggedInUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof KeycloakPrincipal) {
+            KeycloakPrincipal userDetails = (KeycloakPrincipal) authentication.getPrincipal();
+            return userDetails.getName();
+        }
+        return null;
     }
 }

@@ -5,6 +5,7 @@ import com.finbiz.identityService.dto.LoginResponseDTO;
 import com.finbiz.identityService.dto.RegisterUserDTO;
 import com.finbiz.identityService.dto.RoleDTO;
 import com.finbiz.identityService.service.IdentityService;
+import com.finbiz.identityService.util.EncryptionUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,10 @@ public class identityResource {
         identityService.addRoles(roleDTO , username);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+    @PostMapping(value = "/checkRoles")
+    public ResponseEntity<HttpStatus> checkRoles(@RequestBody RoleDTO roleDTO){
 
-
+        identityService.checkRoles(roleDTO , EncryptionUtil.getUsernameForCurrentLoggedInUser());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

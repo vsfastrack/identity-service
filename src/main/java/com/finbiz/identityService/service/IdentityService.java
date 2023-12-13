@@ -25,7 +25,7 @@ public class IdentityService {
         if(ObjectUtils.isEmpty(accessTokenResponse) || StringUtils.isEmpty(accessTokenResponse.getToken()))
             throw BusinessException.of(ErrorCodeConstants.CODE_UNEXPECTED_ERR ,
                     ErrorMsgConstants.MSG_LOGIN_FAILED_AFTER_REGISTRATION , "Auth api err" , null);
-        return LoginResponseDTO.of(accessTokenResponse.getToken());
+        return LoginResponseDTO.of(accessTokenResponse);
     }
     public void register(final RegisterUserDTO registerUserDTO){
         if(keycloakFacade.register(registerUserDTO) != 201)
@@ -34,5 +34,12 @@ public class IdentityService {
     }
     public void addRoles(final RoleDTO roleDTO , String username){
         keycloakFacade.addRoles(roleDTO , username);
+    }
+
+    public boolean checkRoles(final RoleDTO roleDTO , String userId){
+        if(!keycloakFacade.checkRoles(roleDTO,userId))
+            throw BusinessException.of(404 , "Technical Error",
+                    "User does not contain specified roles", null);
+        return true;
     }
 }

@@ -14,6 +14,7 @@ import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.RoleMappingResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
@@ -26,9 +27,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Log4j2
@@ -72,7 +72,7 @@ public class KeycloakFacadeImpl implements KeycloakFacade {
             log.info("Response status received {}",keycloakResponse.getStatus());
             if(keycloakResponse.getStatus() == Response.Status.CREATED.getStatusCode()){
                 String userId = keycloakResponse.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
-                List<String> roleNames = Collections.singletonList("ROLE_USER");
+                List<String> roleNames = Objects.nonNull(registerUserDTO.getIsAuthor()) && registerUserDTO.getIsAuthor() ? Arrays.asList("ROLE_USER","ROLE_AUTHOR") : Collections.singletonList("ROLE_USER");
                 for(String roleName:roleNames) {
                     RoleRepresentation roleRepresentation = realmResource.roles()
                                                             .get(roleName).toRepresentation();
@@ -142,5 +142,28 @@ public class KeycloakFacadeImpl implements KeycloakFacade {
                 RoleRepresentation role = realmResource.roles().get(roleName).toRepresentation();
                 realmResource.users().get(user.getId()).roles().realmLevel().add(Arrays.asList(role));
             });
+    }
+
+    @Override
+    public boolean checkRoles(RoleDTO roleDTO , String userId) {
+            Keycloak keycloakClient = KeycloakBuilder.builder().serverUrl(keycloakConfig.getAuthServerUrl())
+                    .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                    .realm(keycloakConfig.getRealm())
+                    .clientId(keycloakConfig.getClientId())
+                    .username(keycloakConfig.getRootUser())
+                    .password(keycloakConfig.getRootPassword())
+                    .clientSecret(keycloakConfig.getClientSecret())
+                    .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(10).build()).build();
+            keycloakClient.tokenManager().getAccessToken();
+            RealmResource realmResource = keycloakClient.realm(keycloakConfig.getRealm());
+            UsersResource usersResource = realmResource.users();
+            RoleMappingResource roleMappingResource = usersResource.get(userId).roles();
+            List<RoleRepresentation> realmRoles = roleMappingResource.realmLevel().listAll();
+            List<String> roleNames = realmRoles.stream().map(RoleRepresentation::getName).collect(Collectors.toList());
+            for(String roleName : roleDTO.getRoleNames()){
+                if(!roleNames.contains(roleName))
+                    return false;
+            }
+            return true;
     }
 }

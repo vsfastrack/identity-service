@@ -10,4 +10,5 @@ public interface KeycloakFacade {
     int register(RegisterUserDTO registerUserDTO);
     Boolean ifUserExists(String username);
     void addRoles(RoleDTO roleDTO , String username);
+    boolean checkRoles(RoleDTO roleDTO , String username);
 }
